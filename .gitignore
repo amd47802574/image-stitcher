@@ -1,0 +1,20 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 虚拟环境（由 uv 管理，不进版本库）
+.venv/
+venv/
+env/
+
+# 构建产物（打包好的 exe 作为 Release 资产单独发布，不进 git）
+build/
+dist/
+
+# 操作系统 / 编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
