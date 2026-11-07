@@ -10,11 +10,13 @@
     * 纵向拼接 -> 统一宽度（以最大宽度为基准，等比缩放）
 - gap: 图片之间的间隙像素（>=0）
 - bg: 背景色，格式 (R, G, B) 或 (R, G, B, A)
+
+输入图片会先做 EXIF 方向自动校正（手机竖拍照片不会再横躺）。
 """
 
 from __future__ import annotations
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 # 对齐方式常量
 ALIGN_START = "start"
@@ -83,7 +85,8 @@ def stitch(
     if not images:
         raise ValueError("至少需要一张图片")
 
-    imgs = [_normalize(im) for im in images]
+    # EXIF 方向校正（orientation=6/8 等竖拍照片先转正再拼；无 EXIF 时为无害拷贝）
+    imgs = [_normalize(ImageOps.exif_transpose(im)) for im in images]
     n = len(imgs)
     bg = _parse_bg(bg)
 

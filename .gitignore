@@ -18,3 +18,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# 测试运行产物（由 test_stitch.py 运行生成，不进版本库）
+test_output/

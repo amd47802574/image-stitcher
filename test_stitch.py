@@ -1,4 +1,5 @@
 """无头测试：生成测试图 -> 验证各种拼接模式 -> 输出到 temp。"""
+import io
 import os
 from PIL import Image, ImageDraw
 import stitcher
@@ -50,6 +51,20 @@ def main():
                           gap=0, bg=(0, 0, 0, 0))
     assert out.mode == "RGBA"
     results["h_transparent"] = out
+
+    # 6) EXIF 方向自动校正：orientation=6（需逆时针转90°），100x60 应按 60x100 参与拼接
+    exif = Image.Exif()
+    exif[274] = 6  # Orientation
+    buf = io.BytesIO()
+    make_img(100, 60, (255, 255, 0), "EXIF6").save(buf, "JPEG", exif=exif)
+    buf.seek(0)
+    phone_photo = Image.open(buf)
+    assert phone_photo.size == (100, 60)  # 存储尺寸未变
+    out = stitcher.stitch([phone_photo, make_img(40, 100, (255, 0, 255), "D 40x100")],
+                          direction="horizontal", scale_mode="none", gap=0)
+    # 校正后 60x100 与 40x100 横排 -> 100x100
+    assert out.size == (100, 100), out.size
+    results["h_exif_fixed"] = out
 
     # 保存样例
     for k, im in results.items():
